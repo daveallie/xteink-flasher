@@ -1,12 +1,22 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Button, Heading } from '@chakra-ui/react';
+import {
+  Text,
+  Button,
+  Heading,
+  Em,
+  Separator,
+  Card,
+  Alert,
+  Container,
+  Stack,
+  Flex,
+} from '@chakra-ui/react';
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
-import { ColorModeButton } from '@/components/ui/color-mode';
-import styles from './page.module.css';
+import HeaderBar from '@/components/HeaderBar/HeaderBar';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
@@ -14,41 +24,123 @@ export default function Home() {
   const getFile = () => fileInput.current?.getFile();
 
   return (
-    <main className={styles.page}>
-      <Heading size="2xl">Xteink English Firmware Flasher</Heading>
-      <ColorModeButton />
-      <section className={styles.section}>
-        <Heading size="xl">Full flash controls</Heading>
-        <Button onClick={actions.saveFullFlash} disabled={isRunning}>
-          Save full flash
-        </Button>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ flexGrow: 1 }}>
-            <FileUpload ref={fileInput} />
+    <>
+      <HeaderBar />
+      <Container
+        as="main"
+        maxW="3xl"
+        gap="20px"
+        display="flex"
+        flexDirection="column"
+        mt={5}
+        mb={5}
+      >
+        <Alert.Root status="warning">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Proceed with caution</Alert.Title>
+            <Alert.Description>
+              I&apos;ve tried to make this pretty foolproof and the likelihood
+              of unrecoverable things going wrong is extremely low, however
+              it&apos;s never zero. So proceed with care and make sure to grab a
+              backup using <b>Save full flash</b> before flashing your device.
+              <br />
+              <br />
+              Once you start <b>Write flash from file</b> or{' '}
+              <b>Flash English firmware</b>, you should avoid disconnecting your
+              device or closing the tab until the operation is complete.
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+
+        <Stack gap="10px" as="section">
+          <div>
+            <Heading size="xl">Full flash controls</Heading>
+            <Text color="grey" textStyle="sm">
+              These actions will allow you to take a full backup your Xteink
+              device in order to be able to restore it in the case that anything
+              goes wrong.
+              <br />
+              <b>Save full flash</b> will read your device&apos;s flash and save
+              it as <Em>flash.bin</Em>. You can use that file (or someone
+              else&apos;s) with <b>Write full flash from file</b> to overwrite
+              your device&apos;s entire flash.
+            </Text>
           </div>
-          <Button
-            style={{ flexGrow: 1 }}
-            onClick={() => actions.writeFullFlash(getFile)}
-            disabled={isRunning}
-          >
-            Write full flash from file
-          </Button>
-        </div>
-      </section>
-      <section className={styles.section}>
-        <Heading size="xl">OTA fast flash controls</Heading>
-        <Button onClick={actions.flashEnglishFirmware} disabled={isRunning}>
-          Flash English firmware (3.0.8) via OTA
-        </Button>
-        {process.env.NODE_ENV === 'development' && (
-          <Button onClick={actions.debugSteps2} disabled={isRunning}>
-            debug
-          </Button>
-        )}
-      </section>
-      <section className={styles.section}>
-        <Steps steps={stepData} />
-      </section>
-    </main>
+          <Stack gap="4px" as="section">
+            <Button onClick={actions.saveFullFlash} disabled={isRunning}>
+              Save full flash
+            </Button>
+            <Stack direction="row" gap="8px">
+              <Flex grow={1}>
+                <FileUpload ref={fileInput} />
+              </Flex>
+              <Button
+                flexGrow={1}
+                onClick={() => actions.writeFullFlash(getFile)}
+                disabled={isRunning}
+              >
+                Write full flash from file
+              </Button>
+            </Stack>
+          </Stack>
+        </Stack>
+        <Separator />
+        <Stack gap="10px" as="section">
+          <div>
+            <Heading size="xl">OTA fast flash controls</Heading>
+            <Text color="grey" textStyle="sm">
+              Before using this, I&apos;d strongly recommend taking a backup of
+              your device using <b>Save full flash</b> above.
+              <br />
+              <b>Flash English firmware</b> will download the English firmware,
+              clear the OTA partition on your device and overwrite the OTA_0
+              partition with the new firmware. This is significantly faster than
+              a full flash write and will retain all your settings. If it goes
+              wrong, it should be fine to run again.
+            </Text>
+          </div>
+          <Stack gap="4px" as="section">
+            <Button onClick={actions.flashEnglishFirmware} disabled={isRunning}>
+              Flash English firmware (3.0.8)
+            </Button>
+            {process.env.NODE_ENV === 'development' && (
+              <Button onClick={actions.debugSteps2} disabled={isRunning}>
+                debug
+              </Button>
+            )}
+          </Stack>
+        </Stack>
+        <Separator />
+        <Card.Root variant="subtle">
+          <Card.Header>
+            <Heading size="lg">Steps</Heading>
+          </Card.Header>
+          <Card.Body>
+            {stepData.length > 0 ? (
+              <Steps steps={stepData} />
+            ) : (
+              <Alert.Root status="info" variant="surface">
+                <Alert.Indicator />
+                <Alert.Title>
+                  Progress will be shown here once you start an operation
+                </Alert.Title>
+              </Alert.Root>
+            )}
+          </Card.Body>
+        </Card.Root>
+        <Alert.Root status="info">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Device restart instructions</Alert.Title>
+            <Alert.Description>
+              Once you complete a write operation, you will need to restart your
+              device by pressing the small button on the bottom right and then
+              holding the power button.
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+      </Container>
+    </>
   );
 }

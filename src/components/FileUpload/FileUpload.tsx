@@ -28,7 +28,7 @@ export default function FileUpload({
   }));
 
   return (
-    <ChakraUpload.RootProvider gap="1" maxWidth="300px" value={fileUpload}>
+    <ChakraUpload.RootProvider gap="1" value={fileUpload}>
       <ChakraUpload.HiddenInput />
       <InputGroup
         startElement={<LuFileUp />}

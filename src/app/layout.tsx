@@ -4,7 +4,7 @@ import './globals.css';
 import { Provider } from '@/components/ui/provider';
 
 export const metadata: Metadata = {
-  title: 'Xteink English Firmware Flasher',
+  title: 'Xteink Flash Tools',
   description: 'Web based tool to help flash the Xteink device',
 };
 

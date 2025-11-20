@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Flex } from '@chakra-ui/react';
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 
 export default function FlashFromFile({
@@ -15,7 +15,7 @@ export default function FlashFromFile({
   const getFile = () => fileInput.current?.getFile();
 
   return (
-    <div style={{ display: 'flex' }}>
+    <Flex>
       <FileUpload ref={fileInput} />
       <Button
         style={{ flexGrow: 1 }}
@@ -24,6 +24,6 @@ export default function FlashFromFile({
       >
         Write full flash from file
       </Button>
-    </div>
+    </Flex>
   );
 }

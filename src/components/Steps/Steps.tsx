@@ -4,6 +4,7 @@ import {
   Steps as ChakraSteps,
   Progress,
   ProgressCircle,
+  Flex,
 } from '@chakra-ui/react';
 import { StepData } from '@/types/Step';
 
@@ -102,13 +103,10 @@ export default function Steps({ steps }: { steps: StepData[] }) {
           >
             <StepIndicator status={s.status} index={index} />
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '60px',
-                flexGrow: 1,
-              }}
+            <Flex
+              direction="column"
+              flexGrow={1}
+              minHeight={index < steps.length - 1 ? '60px' : undefined}
             >
               <ChakraSteps.Title>{s.name}</ChakraSteps.Title>
               <ChakraSteps.Content
@@ -137,7 +135,7 @@ export default function Steps({ steps }: { steps: StepData[] }) {
                   </Progress.Root>
                 )}
                 {s.status === 'failed' && !!s.error && (
-                  <Alert.Root status="error" style={{ flexGrow: 1 }}>
+                  <Alert.Root status="error" flexGrow={1}>
                     <Alert.Indicator />
                     <Alert.Content>
                       <Alert.Title>{s.error.name}</Alert.Title>
@@ -146,7 +144,7 @@ export default function Steps({ steps }: { steps: StepData[] }) {
                   </Alert.Root>
                 )}
               </ChakraSteps.Content>
-            </div>
+            </Flex>
             <ChakraSteps.Separator />
           </ChakraSteps.Item>
         ))}
