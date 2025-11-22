@@ -1,0 +1,47 @@
+.view {
+  max-height: 500px;
+  overflow-y: auto;
+  position: relative;
+  overscroll-behavior: none;
+  scroll-snap-type: y proximity;
+}
+
+.row {
+  background-color: black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  scroll-snap-align: start;
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.hiddenData {
+  visibility: hidden;
+}
+
+.hexCell {
+  text-transform: uppercase;
+  padding: 0 0.2rem;
+  font-family: monospace;
+}
+
+.hexCell-header {
+  opacity: 0.7;
+}
+
+.hexCell-muted {
+  opacity: 0.5;
+}
+
+.hexCell:nth-of-type(8n) {
+  padding-right: 0.4rem;
+}
+
+.hexCell:nth-of-type(8n + 1) {
+  padding-left: 0.4rem;
+}

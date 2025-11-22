@@ -12,6 +12,7 @@
   "dependencies": {
     "@chakra-ui/react": "^3.29.0",
     "@emotion/react": "^11.14.0",
+    "classnames": "^2.5.1",
     "crc": "^4.3.2",
     "esptool-js": "patch:esptool-js@npm%3A0.5.7#~/.yarn/patches/esptool-js-npm-0.5.7-bd6223d76a.patch",
     "next": "16.0.3",
