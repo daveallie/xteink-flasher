@@ -156,8 +156,9 @@ export default function Home() {
           <Alert.Title>Device restart instructions</Alert.Title>
           <Alert.Description>
             Once you complete a write operation, you will need to restart your
-            device by pressing the small button on the bottom right and then
-            holding the power button.
+            device by pressing and releasing the small button near the bottom
+            right, followed quickly by pressing and holding of the main power
+            button for about 3 seconds.
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>
