@@ -26,15 +26,24 @@
 
 .hexCell {
   text-transform: uppercase;
-  padding: 0 0.2rem;
   font-family: monospace;
+  padding: 0 0.2rem;
 }
 
-.hexCell-header {
+.asciiCell {
+  text-transform: uppercase;
+  font-family: monospace;
+  display: inline-block;
+  width: 12px;
+}
+
+.hexCell-header,
+.asciiCell-header {
   opacity: 0.6;
 }
 
-.hexCell-muted {
+.hexCell-muted,
+.asciiCell-muted {
   opacity: 0.4;
 }
 

@@ -4926,6 +4926,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-window@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "react-window@npm:2.2.3"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/7e97381b269560038c4c76c4ae17121d87efb628fce840fe382e73ae0e9816d4b68384a402340b0a08f9e4a47d8bd7328ae8502fd26b0d9399339a20e1c550be
+  languageName: node
+  linkType: hard
+
 "react@npm:^19.2.0":
   version: 19.2.0
   resolution: "react@npm:19.2.0"
@@ -5833,6 +5843,7 @@ __metadata:
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-icons: "npm:^5.5.0"
+    react-window: "npm:^2.2.3"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.47.0"
   languageName: unknown

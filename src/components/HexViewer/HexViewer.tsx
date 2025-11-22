@@ -1,16 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
+import { List, RowComponentProps } from 'react-window';
 import styles from './styles.module.css';
-
-function chunk<T>(input: T[], size: number) {
-  return input.reduce<T[][]>(
-    (arr, item, idx) =>
-      idx % size === 0
-        ? [...arr, [item]]
-        : [...arr.slice(0, -1), [...(arr.slice(-1)[0] ?? []), item]],
-    [],
-  );
-}
 
 function HexCell({
   data,
@@ -39,7 +30,7 @@ function AsciiCell({
   const v = variant ?? (knownChar ? 'default' : 'muted');
 
   return (
-    <span className={cn(styles.hexCell, styles[`hexCell-${v}`])}>
+    <span className={cn(styles.asciiCell, styles[`asciiCell-${v}`])}>
       {knownChar ? String.fromCharCode(data) : '.'}
     </span>
   );
@@ -49,12 +40,12 @@ function HexRow({
   data,
   variant,
 }: {
-  data: number[];
+  data: Uint8Array;
   variant?: 'default' | 'header' | 'muted';
 }) {
   return (
     <div>
-      {data.map((d, i) => (
+      {[...data].map((d, i) => (
         <HexCell
           // eslint-disable-next-line react/no-array-index-key
           key={i}
@@ -70,12 +61,12 @@ function AsciiRow({
   data,
   variant,
 }: {
-  data: number[];
+  data: Uint8Array;
   variant?: 'default' | 'header' | 'muted';
 }) {
   return (
     <div>
-      {data.map((d, i) => (
+      {[...data].map((d, i) => (
         <AsciiCell
           // eslint-disable-next-line react/no-array-index-key
           key={i}
@@ -96,14 +87,20 @@ function HeaderRow({ addressWidth }: { addressWidth: number }) {
         </span>
       </div>
       <HexRow
-        data={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf]}
+        data={
+          new Uint8Array([
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+          ])
+        }
         variant="header"
       />
       <div>
         <span className={cn(styles.hexCell, styles.hiddenData)}>0</span>
       </div>
       <AsciiRow
-        data={['A', 'S', 'C', 'I', 'I'].map((c) => c.charCodeAt(0))}
+        data={
+          new Uint8Array(['A', 'S', 'C', 'I', 'I'].map((c) => c.charCodeAt(0)))
+        }
         variant="header"
       />
     </div>
@@ -111,48 +108,46 @@ function HeaderRow({ addressWidth }: { addressWidth: number }) {
 }
 
 function DataRow({
-  address,
+  allData,
   addressWidth,
-  data,
-}: {
-  address: number;
+  index,
+  style,
+}: RowComponentProps<{
+  allData: Uint8Array;
   addressWidth: number;
-  data: number[];
-}) {
+}>) {
+  const address = index * 16;
+
   return (
-    <div className={styles.row}>
+    <div className={styles.row} style={style}>
       <div>
         <span className={cn(styles.hexCell, styles['hexCell-header'])}>
           {address.toString(16).padStart(addressWidth, '0')}
         </span>
       </div>
-      <HexRow data={data} />
+      <HexRow data={allData.slice(index * 16, (index + 1) * 16)} />
       <div>
         <span className={cn(styles.hexCell, styles.hiddenData)}>0</span>
       </div>
-      <AsciiRow data={data} />
+      <AsciiRow data={allData.slice(index * 16, (index + 1) * 16)} />
     </div>
   );
 }
 
 export default function HexViewer({ data }: { data: Uint8Array }) {
-  const addressWidth = 4;
-  const groupedData = chunk([...data], 16);
+  const addressWidth = Math.max((data.length - 1).toString(16).length, 2);
 
   return (
     <div>
       <HeaderRow addressWidth={addressWidth} />
-      <div className={styles.view} style={{ height: 24 * 20 }}>
-        {groupedData.map((group, i) => (
-          <DataRow
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            addressWidth={addressWidth}
-            address={i * 16}
-            data={group}
-          />
-        ))}
-      </div>
+      <List
+        rowComponent={DataRow}
+        rowCount={Math.ceil(data.length / 16)}
+        rowHeight={24}
+        rowProps={{ allData: data, addressWidth }}
+        className={styles.view}
+        style={{ height: 24 * 20 }}
+      />
     </div>
   );
 }
