@@ -16,21 +16,22 @@ import {
 import { useEspOperations } from '@/esp/useEspOperations';
 import Steps from '@/components/Steps';
 import { OtaPartitionState } from '@/esp/OtaPartitionState';
-import OtaPartition, { OtaPartitionDetails } from '@/esp/OtaPartition';
+import OtaPartition from '@/esp/OtaPartition';
 import HexSpan from '@/components/HexSpan';
+import HexViewer from '@/components/HexViewer';
 
-function OtadataDebug({
-  partitions,
-  bootPartitionLabel,
-}: {
-  partitions: OtaPartitionDetails[];
-  bootPartitionLabel: string;
-}) {
+const sampleData = new Uint8Array(0x2000).map(() =>
+  Math.round(Math.random() * 255),
+);
+
+function OtadataDebug({ otaPartition }: { otaPartition: OtaPartition }) {
+  const bootPartitionLabel = otaPartition.getCurrentBootPartitionLabel();
+
   return (
     <Stack>
       <Heading size="lg">OTA data</Heading>
       <Stack direction="row">
-        {partitions.map((partition) => (
+        {otaPartition.otaAppPartitions().map((partition) => (
           <Card.Root
             variant="subtle"
             size="sm"
@@ -111,6 +112,7 @@ function OtadataDebug({
           </Card.Root>
         ))}
       </Stack>
+      <HexViewer data={otaPartition.data} />
     </Stack>
   );
 }
@@ -122,12 +124,7 @@ export default function Debug() {
   const runOtadataActionWithOutput =
     (fn: () => Promise<OtaPartition>) => async () => {
       const data = await fn();
-      setDebugOutputNode(
-        <OtadataDebug
-          partitions={data.otaAppPartitions()}
-          bootPartitionLabel={data.getCurrentBootPartitionLabel()}
-        />,
-      );
+      setDebugOutputNode(<OtadataDebug otaPartition={data} />);
     };
 
   return (
@@ -169,6 +166,8 @@ export default function Debug() {
           </Button>
         </Stack>
       </Stack>
+      <Separator />
+      <HexViewer data={sampleData} />
       <Separator />
       <Card.Root variant="subtle">
         <Card.Header>

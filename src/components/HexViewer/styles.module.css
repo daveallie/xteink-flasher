@@ -1,16 +1,16 @@
 .view {
-  max-height: 500px;
+  overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   overscroll-behavior: none;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
 }
 
 .row {
-  background-color: black;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  white-space: nowrap;
   scroll-snap-align: start;
 }
 
@@ -31,11 +31,11 @@
 }
 
 .hexCell-header {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .hexCell-muted {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .hexCell:nth-of-type(8n) {

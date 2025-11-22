@@ -1,6 +1,5 @@
 import React from 'react';
 import cn from 'classnames';
-import { ScrollArea } from '@chakra-ui/react';
 import styles from './styles.module.css';
 
 function chunk<T>(input: T[], size: number) {
@@ -15,14 +14,33 @@ function chunk<T>(input: T[], size: number) {
 
 function HexCell({
   data,
-  variant = 'default',
+  variant,
 }: {
   data: number;
   variant?: 'default' | 'header' | 'muted';
 }) {
+  const v = variant ?? (data === 0 ? 'muted' : 'default');
+
   return (
-    <span className={cn(styles.hexCell, styles[`hexCell-${variant}`])}>
+    <span className={cn(styles.hexCell, styles[`hexCell-${v}`])}>
       {data.toString(16).padStart(2, '0')}
+    </span>
+  );
+}
+
+function AsciiCell({
+  data,
+  variant,
+}: {
+  data: number;
+  variant?: 'default' | 'header' | 'muted';
+}) {
+  const knownChar = data >= 32 && data <= 126;
+  const v = variant ?? (knownChar ? 'default' : 'muted');
+
+  return (
+    <span className={cn(styles.hexCell, styles[`hexCell-${v}`])}>
+      {knownChar ? String.fromCharCode(data) : '.'}
     </span>
   );
 }
@@ -41,7 +59,28 @@ function HexRow({
           // eslint-disable-next-line react/no-array-index-key
           key={i}
           data={d}
-          variant={variant ?? (d === 0 ? 'muted' : 'default')}
+          variant={variant}
+        />
+      ))}
+    </div>
+  );
+}
+
+function AsciiRow({
+  data,
+  variant,
+}: {
+  data: number[];
+  variant?: 'default' | 'header' | 'muted';
+}) {
+  return (
+    <div>
+      {data.map((d, i) => (
+        <AsciiCell
+          // eslint-disable-next-line react/no-array-index-key
+          key={i}
+          data={d}
+          variant={variant}
         />
       ))}
     </div>
@@ -58,6 +97,13 @@ function HeaderRow({ addressWidth }: { addressWidth: number }) {
       </div>
       <HexRow
         data={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf]}
+        variant="header"
+      />
+      <div>
+        <span className={cn(styles.hexCell, styles.hiddenData)}>0</span>
+      </div>
+      <AsciiRow
+        data={['A', 'S', 'C', 'I', 'I'].map((c) => c.charCodeAt(0))}
         variant="header"
       />
     </div>
@@ -81,6 +127,10 @@ function DataRow({
         </span>
       </div>
       <HexRow data={data} />
+      <div>
+        <span className={cn(styles.hexCell, styles.hiddenData)}>0</span>
+      </div>
+      <AsciiRow data={data} />
     </div>
   );
 }
@@ -90,30 +140,19 @@ export default function HexViewer({ data }: { data: Uint8Array }) {
   const groupedData = chunk([...data], 16);
 
   return (
-    <div className={styles.view}>
-      <ScrollArea.Root>
-        <ScrollArea.Viewport>
-          <ScrollArea.Content
-            scrollSnapStrictness="mandatory"
-            scrollSnapType="y"
-          >
-            <HeaderRow addressWidth={addressWidth} />
-            {groupedData.map((group, i) => (
-              <DataRow
-                // eslint-disable-next-line react/no-array-index-key
-                key={i}
-                addressWidth={addressWidth}
-                address={i * 16}
-                data={group}
-              />
-            ))}
-          </ScrollArea.Content>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar>
-          <ScrollArea.Thumb />
-        </ScrollArea.Scrollbar>
-        <ScrollArea.Corner />
-      </ScrollArea.Root>
+    <div>
+      <HeaderRow addressWidth={addressWidth} />
+      <div className={styles.view} style={{ height: 24 * 20 }}>
+        {groupedData.map((group, i) => (
+          <DataRow
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            addressWidth={addressWidth}
+            address={i * 16}
+            data={group}
+          />
+        ))}
+      </div>
     </div>
   );
 }
