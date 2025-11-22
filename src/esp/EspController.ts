@@ -40,7 +40,6 @@ export default class EspController {
     await this.espLoader.after(skipReset ? 'no_reset' : undefined);
   }
 
-  // Warning: Do not use until https://github.com/espressif/esptool-js/issues/218 is addressed
   async readFullFlash(
     onPacketReceived?: (
       packet: Uint8Array,
@@ -49,38 +48,6 @@ export default class EspController {
     ) => void,
   ) {
     return this.espLoader.readFlash(0, 0x1000000, onPacketReceived);
-  }
-
-  // Due to https://github.com/espressif/esptool-js/issues/218, we need to read
-  // out the full flash in chunks
-  async readFullFlashInChunks(
-    onPacketReceived?: (
-      packet: Uint8Array,
-      progress: number,
-      totalSize: number,
-    ) => void,
-  ) {
-    const chunks = 0x100;
-    const totalSize = 0x1000000;
-    const chunkSize = totalSize / chunks;
-
-    const response = new Uint8Array(totalSize);
-    for (let chunk = 0; chunk < chunks; chunk += 1) {
-      const offset = chunk * chunkSize;
-
-      // eslint-disable-next-line no-await-in-loop
-      const chunkContents = await this.espLoader.readFlash(
-        offset,
-        chunkSize,
-        onPacketReceived
-          ? (packet: Uint8Array, pSize: number, _tSize: number) =>
-              onPacketReceived(packet, offset + pSize, totalSize)
-          : undefined,
-      );
-      response.set(chunkContents, offset);
-    }
-
-    return response;
   }
 
   async writeFullFlash(

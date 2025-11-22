@@ -12,13 +12,11 @@ import {
   Container,
   Stack,
   Flex,
-  Link,
 } from '@chakra-ui/react';
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
 import HeaderBar from '@/components/HeaderBar/HeaderBar';
-import { toaster } from '@/components/ui/toaster';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
@@ -80,25 +78,7 @@ export default function Home() {
           <Stack gap="4px" as="section">
             <Button
               variant="subtle"
-              onClick={() =>
-                toaster.create({
-                  title: 'Sorry, this is broken right now',
-                  description: (
-                    <Text>
-                      I&apos;m waiting on a fix from esptool-js, see
-                      <Link
-                        href="https://github.com/espressif/esptool-js/issues/218"
-                        target="_blank"
-                        color="white"
-                      >
-                        https://github.com/espressif/esptool-js/issues/218
-                      </Link>
-                    </Text>
-                  ),
-                  type: 'error',
-                })
-              }
-              // onClick={actions.saveFullFlash}
+              onClick={actions.saveFullFlash}
               disabled={isRunning}
             >
               Save full flash

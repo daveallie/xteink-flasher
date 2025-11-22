@@ -1,0 +1,16 @@
+diff --git a/lib/webserial.js b/lib/webserial.js
+index 568e22b52bb61078bab9f20784925d51798e76d6..586401fdf7a4b5b0440b6063647a6b21908f33a8 100644
+--- a/lib/webserial.js
++++ b/lib/webserial.js
+@@ -45,11 +45,6 @@ class Transport {
+      * @param {string} message Message to format as trace line.
+      */
+     trace(message) {
+-        const delta = Date.now() - this.lastTraceTime;
+-        const prefix = `TRACE ${delta.toFixed(3)}`;
+-        const traceMessage = `${prefix} ${message}`;
+-        console.log(traceMessage);
+-        this.traceLog += traceMessage + "\n";
+     }
+     async returnTrace() {
+         try {

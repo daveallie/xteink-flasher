@@ -3446,7 +3446,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esptool-js@npm:^0.5.7":
+"esptool-js@npm:0.5.7":
   version: 0.5.7
   resolution: "esptool-js@npm:0.5.7"
   dependencies:
@@ -5793,7 +5793,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.5.4"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^7.0.1"
-    esptool-js: "npm:^0.5.7"
+    esptool-js: "npm:0.5.7"
     globals: "npm:^16.5.0"
     next: "npm:16.0.3"
     next-themes: "npm:^0.4.6"
