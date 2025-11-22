@@ -239,6 +239,34 @@ export function useEspOperations() {
     return otaPartition;
   };
 
+  const readAppPartition = async (partitionLabel: 'app0' | 'app1') => {
+    initializeSteps([
+      'Connect to device',
+      `Read app partition (${partitionLabel})`,
+      'Disconnect from device',
+    ]);
+
+    const espController = await runStep('Connect to device', async () => {
+      const c = await EspController.fromRequestedDevice();
+      await c.connect();
+      return c;
+    });
+
+    const data = await runStep(`Read app partition (${partitionLabel})`, () =>
+      espController.readAppPartition(partitionLabel, (_, p, t) =>
+        updateStepData(`Read app partition (${partitionLabel})`, {
+          progress: { current: p, total: t },
+        }),
+      ),
+    );
+
+    await runStep('Disconnect from device', () =>
+      espController.disconnect({ skipReset: true }),
+    );
+
+    return data;
+  };
+
   const swapBootPartition = async () => {
     initializeSteps([
       'Connect to device',
@@ -354,6 +382,7 @@ export function useEspOperations() {
     },
     debugActions: {
       readDebugOtadata: wrapWithRunning(readDebugOtadata),
+      readAppPartition: wrapWithRunning(readAppPartition),
       swapBootPartition: wrapWithRunning(swapBootPartition),
     },
   };

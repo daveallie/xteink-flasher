@@ -92,6 +92,18 @@ export default class EspController {
     await this.writeData(partition.data, 0xe000, reportProgress);
   }
 
+  async readAppPartition(
+    partitionLabel: 'app0' | 'app1',
+    onPacketReceived?: (
+      packet: Uint8Array,
+      progress: number,
+      totalSize: number,
+    ) => void,
+  ) {
+    const offset = partitionLabel === 'app0' ? 0x10000 : 0x650000;
+    return this.espLoader.readFlash(offset, 0x640000, onPacketReceived);
+  }
+
   async writeAppPartition(
     partitionLabel: 'app0' | 'app1',
     data: Uint8Array,
