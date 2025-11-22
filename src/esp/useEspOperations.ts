@@ -74,22 +74,21 @@ export function useEspOperations() {
       ),
     );
 
-    const currentBootPartition = otaPartition.getCurrentBootPartition();
-    const nextBootPartition =
-      currentBootPartition?.partitionLabel === 'app1' ? 'app0' : 'app1';
-
-    await wrapWithStep('Flash app partition', () =>
+    const backupPartitionLabel = otaPartition.getCurrentBackupPartitionLabel();
+    const flashAppPartitionStepName = `Flash app partition (${backupPartitionLabel})`;
+    updateStepData('Flash app partition', { name: flashAppPartitionStepName });
+    await wrapWithStep(flashAppPartitionStepName, () =>
       espController.writeAppPartition(
-        nextBootPartition,
+        backupPartitionLabel,
         firmwareFile,
         (_, p, t) =>
-          updateStepData('Flash app partition', {
+          updateStepData(flashAppPartitionStepName, {
             progress: { current: p, total: t },
           }),
       ),
     );
 
-    otaPartition.setBootPartition(nextBootPartition);
+    otaPartition.setBootPartition(backupPartitionLabel);
     await wrapWithStep('Flash otadata partition', () =>
       espController.writeOtadataPartition(otaPartition, (_, p, t) =>
         updateStepData('Flash otadata partition', {
