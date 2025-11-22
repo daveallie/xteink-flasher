@@ -106,11 +106,12 @@ export default function Home() {
               Before using this, I&apos;d strongly recommend taking a backup of
               your device using <b>Save full flash</b> above.
               <br />
-              <b>Flash English firmware</b> will download the English firmware,
-              clear the OTA partition on your device and overwrite the OTA_0
-              partition with the new firmware. This is significantly faster than
-              a full flash write and will retain all your settings. If it goes
-              wrong, it should be fine to run again.
+              <b>Flash English/Chinese firmware</b> will download the firmware,
+              overwrite the backup partition with the new firmware, and swap
+              over to using this partition (leaving your existing firmware as
+              the new backup). This is significantly faster than a full flash
+              write and will retain all your settings. If it goes wrong, it
+              should be fine to run again.
             </Text>
           </div>
           <Stack gap="4px" as="section">
