@@ -1,6 +1,7 @@
 'use client';
 
 import { ESPLoader, Transport } from 'esptool-js';
+import OtaPartition from '@/esp/OtaPartition';
 
 export default class EspController {
   static async requestDevice() {
@@ -37,7 +38,7 @@ export default class EspController {
   }
 
   async disconnect({ skipReset = false }: { skipReset?: boolean } = {}) {
-    await this.espLoader.after(skipReset ? 'no_reset' : undefined);
+    await this.espLoader.after(skipReset ? 'no_reset' : 'hard_reset');
   }
 
   async readFullFlash(
@@ -67,39 +68,31 @@ export default class EspController {
     await this.writeData(data, 0, reportProgress);
   }
 
-  async writeOtaPartition(
-    data: Uint8Array,
+  async readOtadataPartition(
+    onPacketReceived?: (
+      packet: Uint8Array,
+      progress: number,
+      totalSize: number,
+    ) => void,
+  ) {
+    return new OtaPartition(
+      await this.espLoader.readFlash(0xe000, 0x2000, onPacketReceived),
+    );
+  }
+
+  async writeOtadataPartition(
+    partition: OtaPartition,
     reportProgress?: (
       fileIndex: number,
       written: number,
       total: number,
     ) => void,
   ) {
-    if (data.length !== 0x2000) {
-      throw new Error(
-        `Data length must be 0x2000, but got 0x${data.length.toString().padStart(4, '0')}`,
-      );
-    }
-
-    await this.writeData(data, 0xe000, reportProgress);
+    await this.writeData(partition.data, 0xe000, reportProgress);
   }
 
-  async writeEmptyOtaPartition(
-    reportProgress?: (
-      fileIndex: number,
-      written: number,
-      total: number,
-    ) => void,
-  ) {
-    const u8Array = new Uint8Array(0x2000);
-    for (let i = 0; i < 0x2000; i += 1) {
-      u8Array[i] = 255;
-    }
-
-    await this.writeOtaPartition(u8Array, reportProgress);
-  }
-
-  async writeOta0(
+  async writeAppPartition(
+    partitionLabel: 'app0' | 'app1',
     data: Uint8Array,
     reportProgress?: (
       fileIndex: number,
@@ -116,7 +109,9 @@ export default class EspController {
       );
     }
 
-    await this.writeData(data, 0x10000, reportProgress);
+    const offset = partitionLabel === 'app0' ? 0x10000 : 0x650000;
+
+    await this.writeData(data, offset, reportProgress);
   }
 
   private async writeData(

@@ -2832,6 +2832,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crc@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "crc@npm:4.3.2"
+  peerDependencies:
+    buffer: ">=6.0.3"
+  peerDependenciesMeta:
+    buffer:
+      optional: true
+  checksum: 10c0/61b36f9be3ade1bea49bd45a7e59ecbe1c2d75f043425680dcb37ebf753be65517c41bc3d485d63b2016d7c7fa5669854d366775e18fe698c95de27e27c41528
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
@@ -3454,6 +3466,17 @@ __metadata:
     pako: "npm:^2.1.0"
     tslib: "npm:^2.4.1"
   checksum: 10c0/4b473167f41eb75b2bb79aedb5ce2dd45471e9652eac0d5eef995744c5ceffd9868aa0e4ddfa92e69d55a4d84005c30925eceaa6c1c3f8f0b454bc6eab4fd262
+  languageName: node
+  linkType: hard
+
+"esptool-js@patch:esptool-js@npm%3A0.5.7#~/.yarn/patches/esptool-js-npm-0.5.7-bd6223d76a.patch":
+  version: 0.5.7
+  resolution: "esptool-js@patch:esptool-js@npm%3A0.5.7#~/.yarn/patches/esptool-js-npm-0.5.7-bd6223d76a.patch::version=0.5.7&hash=455211"
+  dependencies:
+    atob-lite: "npm:^2.0.0"
+    pako: "npm:^2.1.0"
+    tslib: "npm:^2.4.1"
+  checksum: 10c0/e3b6710ece74b78d8f16a6089479596870e2ce5a11e534b810fc2b4f75f12ab915434fa086269ea38a09a7569f1f06f34b3ec3514b81d1aa220ceb7c749b373c
   languageName: node
   linkType: hard
 
@@ -5784,6 +5807,7 @@ __metadata:
     "@types/react": "npm:^19.2.6"
     "@types/react-dom": "npm:^19.2.3"
     babel-plugin-react-compiler: "npm:^1.0.0"
+    crc: "npm:^4.3.2"
     eslint: "npm:^9.39.1"
     eslint-config-airbnb-extended: "npm:^2.3.2"
     eslint-config-prettier: "npm:^10.1.8"
@@ -5793,7 +5817,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.5.4"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^7.0.1"
-    esptool-js: "npm:0.5.7"
+    esptool-js: "patch:esptool-js@npm%3A0.5.7#~/.yarn/patches/esptool-js-npm-0.5.7-bd6223d76a.patch"
     globals: "npm:^16.5.0"
     next: "npm:16.0.3"
     next-themes: "npm:^0.4.6"
