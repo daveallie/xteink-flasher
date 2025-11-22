@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { getFirmware } from '@/remote/firmwareFetcher';
 import { StepData } from '@/types/Step';
 import { downloadData } from '@/utils/download';
+import { wrapWithWakeLock } from '@/utils/wakelock';
 import EspController from './EspController';
 
 export function useEspOperations() {
@@ -99,9 +100,12 @@ export function useEspOperations() {
       return c;
     });
 
-    const firmwareFile = await wrapWithStep('Read flash', () =>
-      espController.readFullFlash((_, p, t) =>
-        updateStepData('Read flash', { progress: { current: p, total: t } }),
+    const firmwareFile = await wrapWithStep(
+      'Read flash',
+      wrapWithWakeLock(() =>
+        espController.readFullFlash((_, p, t) =>
+          updateStepData('Read flash', { progress: { current: p, total: t } }),
+        ),
       ),
     );
 
