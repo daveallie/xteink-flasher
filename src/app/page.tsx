@@ -116,7 +116,7 @@ export default function Home() {
             onClick={actions.flashEnglishFirmware}
             disabled={isRunning}
           >
-            Flash English firmware (3.0.8)
+            Flash English firmware (3.1.0)
           </Button>
           <Button
             variant="subtle"
