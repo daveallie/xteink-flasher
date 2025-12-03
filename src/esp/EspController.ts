@@ -116,7 +116,7 @@ export default class EspController {
     if (data.length > 0x640000) {
       throw new Error(`Data cannot be larger than 0x640000`);
     }
-    if (data.length < 0x320000) {
+    if (data.length < 0x100000) {
       throw new Error(
         `Data seems too small, are you sure this is the right file?`,
       );
