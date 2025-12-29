@@ -123,7 +123,7 @@ export default function Home() {
             onClick={actions.flashChineseFirmware}
             disabled={isRunning}
           >
-            Flash Chinese firmware (3.1.1)
+            Flash Chinese firmware (3.1.4)
           </Button>
           <Button
             variant="subtle"

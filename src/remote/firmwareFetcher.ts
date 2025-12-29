@@ -3,8 +3,8 @@
 const officialFirmwareUrls = {
   '3.1.1-EN':
     'http://gotaserver.xteink.com/api/download/ESP32C3/V3.1.1/V3.1.1-EN.bin',
-  '3.1.1-CH':
-    'http://47.122.74.33:5000/api/download/ESP32C3/V3.1.1/V3.1.1-CH.bin',
+  '3.1.4-CH':
+    'http://47.122.74.33:5000/api/download/ESP32C3/V3.1.4/V3.1.4-CH-X4.bin',
 };
 
 export async function getOfficialFirmware(

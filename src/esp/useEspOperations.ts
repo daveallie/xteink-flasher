@@ -87,7 +87,7 @@ export function useEspOperations() {
   const flashEnglishFirmware = async () =>
     flashRemoteFirmware(() => getOfficialFirmware('3.1.1-EN'));
   const flashChineseFirmware = async () =>
-    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-CH'));
+    flashRemoteFirmware(() => getOfficialFirmware('3.1.4-CH'));
   const flashCrossPointFirmware = async () =>
     flashRemoteFirmware(() => getCommunityFirmware('CrossPoint'));
 
