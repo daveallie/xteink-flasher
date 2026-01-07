@@ -101,30 +101,20 @@ export default function Home() {
               your device using <b>Save full flash</b> above.
             </p>
             <p>
-              <b>Flash to current partition</b> will download the firmware and
-              overwrite your current running partition. The device will reboot
-              with the new firmware on the same partition. This is fast and
-              retains all settings.
-            </p>
-            <p>
               <b>Flash to backup partition</b> will download the firmware,
               overwrite the backup partition with the new firmware, and swap
               over to using this partition (leaving your existing firmware as
-              the new backup). This is also fast and retains all settings, with
+              the new backup). This is fast and retains all settings, with
               the option to swap back if needed.
+            </p>
+            <p>
+              For more advanced flashing options (like flashing to the current
+              partition), see the <b>Debug</b> page.
             </p>
           </Stack>
         </div>
         <Stack as="section">
           <Stack direction="row" gap={2}>
-            <Button
-              variant="subtle"
-              flexGrow={1}
-              onClick={actions.flashEnglishFirmware}
-              disabled={isRunning}
-            >
-              Flash English (3.1.1) to current
-            </Button>
             <Button
               variant="outline"
               flexGrow={1}
@@ -136,14 +126,6 @@ export default function Home() {
           </Stack>
           <Stack direction="row" gap={2}>
             <Button
-              variant="subtle"
-              flexGrow={1}
-              onClick={actions.flashChineseFirmware}
-              disabled={isRunning}
-            >
-              Flash Chinese (3.1.5) to current
-            </Button>
-            <Button
               variant="outline"
               flexGrow={1}
               onClick={actions.flashChineseFirmwareToBackup}
@@ -154,38 +136,18 @@ export default function Home() {
           </Stack>
           <Stack direction="row" gap={2}>
             <Button
-              variant="subtle"
-              flexGrow={1}
-              onClick={actions.flashCrossPointFirmware}
-              disabled={isRunning}
-            >
-              Flash CrossPoint to current
-            </Button>
-            <Button
               variant="outline"
               flexGrow={1}
               onClick={actions.flashCrossPointFirmwareToBackup}
               disabled={isRunning}
             >
-              Flash CrossPoint to backup
+              Flash CrossPoint firmware (Community) to backup
             </Button>
           </Stack>
           <Stack direction="row" gap={2}>
             <Flex grow={1}>
               <FileUpload ref={appPartitionFileInput} />
             </Flex>
-            <Button
-              variant="subtle"
-              flexGrow={1}
-              onClick={() =>
-                actions.flashCustomFirmware(() =>
-                  appPartitionFileInput.current?.getFile(),
-                )
-              }
-              disabled={isRunning}
-            >
-              Flash file to current
-            </Button>
             <Button
               variant="outline"
               flexGrow={1}
