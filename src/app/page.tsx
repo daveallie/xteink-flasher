@@ -181,6 +181,19 @@ export default function Home() {
       <Alert.Root status="info">
         <Alert.Indicator />
         <Alert.Content>
+          <Alert.Title>Change device language</Alert.Title>
+          <Alert.Description>
+            Before starting the process, it is recommended to change the device
+            language to English. To do this, select "Settings" icon, then
+            click "OK / Confirm" button and "OK / Confirm" again until English is shown.
+            Otherwise, the language will still be Chinese after flashing
+            and you may not notice changes.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert.Root>
+      <Alert.Root status="info">
+        <Alert.Indicator />
+        <Alert.Content>
           <Alert.Title>Device restart instructions</Alert.Title>
           <Alert.Description>
             Once you complete a write operation, you will need to restart your
