@@ -35,3 +35,11 @@ export async function getCommunityFirmware(firmware: 'CrossPoint') {
 
   throw new Error('Unsupported community firmware');
 }
+
+export async function getCommunityFirmwareVersion() {
+  const releaseData = await fetch(
+    'https://api.github.com/repos/daveallie/crosspoint-reader/releases/latest',
+    { cache: 'no-store' }
+  ).then(r => r.json());
+  return releaseData.tag_name as string;
+}
