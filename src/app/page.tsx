@@ -21,13 +21,13 @@ export default function Home() {
   const fullFlashFileInput = useRef<FileUploadHandle>(null);
   const appPartitionFileInput = useRef<FileUploadHandle>(null);
 
-  const [version, setVersion] = useState<string>('unknown');
+  const [version, setVersion] = useState<string>('------');
 
   useEffect(() => {
     getCommunityFirmwareVersion()
       .then(setVersion)
       .catch(() => {
-        setVersion('unknown')
+        setVersion('------')
       });
   }, []);
 
