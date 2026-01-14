@@ -71,12 +71,12 @@ export function useEspOperations() {
     await runStep('Reset device', () => espController.disconnect());
   };
 
-  const flashEnglishFirmware = async () =>
-    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-EN'));
-  const flashChineseFirmware = async () =>
-    flashRemoteFirmware(() => getOfficialFirmware('3.1.5-CH'));
-  const flashCrossPointFirmware = async () =>
-    flashRemoteFirmware(() => getCommunityFirmware('CrossPoint'));
+  const flashEnglishFirmwareToBackup = async () =>
+    flashRemoteFirmwareToBackup(() => getOfficialFirmware('3.1.1-EN'));
+  const flashChineseFirmwareToBackup = async () =>
+    flashRemoteFirmwareToBackup(() => getOfficialFirmware('3.1.7-CH'));
+  const flashCrossPointFirmwareToBackup = async () =>
+    flashRemoteFirmwareToBackup(() => getCommunityFirmware('CrossPoint'));
 
   const flashRemoteFirmwareToBackup = async (
     getFirmware: () => Promise<Uint8Array>,
@@ -139,12 +139,12 @@ export function useEspOperations() {
     await runStep('Reset device', () => espController.disconnect());
   };
 
-  const flashEnglishFirmwareToBackup = async () =>
-    flashRemoteFirmwareToBackup(() => getOfficialFirmware('3.1.1-EN'));
-  const flashChineseFirmwareToBackup = async () =>
-    flashRemoteFirmwareToBackup(() => getOfficialFirmware('3.1.5-CH'));
-  const flashCrossPointFirmwareToBackup = async () =>
-    flashRemoteFirmwareToBackup(() => getCommunityFirmware('CrossPoint'));
+  const flashEnglishFirmware = async () =>
+    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-EN'));
+  const flashChineseFirmware = async () =>
+    flashRemoteFirmware(() => getOfficialFirmware('3.1.7-CH'));
+  const flashCrossPointFirmware = async () =>
+    flashRemoteFirmware(() => getCommunityFirmware('CrossPoint'));
 
   const flashCustomFirmware = async (getFile: () => File | undefined) => {
     initializeSteps([

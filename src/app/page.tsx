@@ -131,7 +131,7 @@ export default function Home() {
               onClick={actions.flashChineseFirmwareToBackup}
               disabled={isRunning}
             >
-              Flash Chinese (3.1.5) to backup
+              Flash Chinese (3.1.7) to backup
             </Button>
           </Stack>
           <Stack direction="row" gap={2}>
