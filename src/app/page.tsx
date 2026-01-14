@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Button,
   Heading,
@@ -14,11 +14,22 @@ import {
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
+import { getCommunityFirmwareData } from '@/remote/firmwareFetcher';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
   const fullFlashFileInput = useRef<FileUploadHandle>(null);
   const appPartitionFileInput = useRef<FileUploadHandle>(null);
+
+  const [version, setVersion] = useState<string>('\(fetching...\) date');
+
+  useEffect(() => {
+    getCommunityFirmwareData()
+      .then(setVersion)
+      .catch(() => {
+        setVersion('\(error\)');
+      });
+  }, []);
 
   return (
     <Flex direction="column" gap="20px">
@@ -130,7 +141,7 @@ export default function Home() {
             onClick={actions.flashCrossPointFirmware}
             disabled={isRunning}
           >
-            Flash CrossPoint firmware (Community)
+            Flash CrossPoint firmware {version}
           </Button>
           <Stack direction="row">
             <Flex grow={1}>

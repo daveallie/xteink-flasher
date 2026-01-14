@@ -35,3 +35,26 @@ export async function getCommunityFirmware(firmware: 'CrossPoint') {
 
   throw new Error('Unsupported community firmware');
 }
+
+export async function getCommunityFirmwareData() {
+  const response = await fetch(
+    'https://api.github.com/repos/daveallie/crosspoint-reader/releases/latest',
+    {
+      next: { revalidate: 900 } // every 15 minutes
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch firmware version');
+  }
+
+  const releaseData = await response.json();
+  const version = releaseData.tag_name;
+  const date = new Date(releaseData.published_at);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `\(${version}\) – ${day}.${month}.${year}`;
+}
