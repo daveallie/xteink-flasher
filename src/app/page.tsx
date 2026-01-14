@@ -14,7 +14,7 @@ import {
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
-import { getCommunityFirmwareVersion } from '@/remote/firmwareFetcher';
+import { getCommunityFirmwareData } from '@/remote/firmwareFetcher';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
@@ -24,7 +24,7 @@ export default function Home() {
   const [version, setVersion] = useState<string>('------');
 
   useEffect(() => {
-    getCommunityFirmwareVersion()
+    getCommunityFirmwareData()
       .then(setVersion)
       .catch(() => {
         setVersion('------')
@@ -141,7 +141,7 @@ export default function Home() {
             onClick={actions.flashCrossPointFirmware}
             disabled={isRunning}
           >
-            Flash CrossPoint firmware ({version})
+            Flash CrossPoint firmware {version}
           </Button>
           <Stack direction="row">
             <Flex grow={1}>
