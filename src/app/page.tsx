@@ -116,7 +116,7 @@ export default function Home() {
         <Stack as="section">
           <Stack direction="row" gap={2}>
             <Button
-              variant="outline"
+              variant="subtle"
               flexGrow={1}
               onClick={actions.flashEnglishFirmwareToBackup}
               disabled={isRunning}
@@ -126,7 +126,7 @@ export default function Home() {
           </Stack>
           <Stack direction="row" gap={2}>
             <Button
-              variant="outline"
+              variant="subtle"
               flexGrow={1}
               onClick={actions.flashChineseFirmwareToBackup}
               disabled={isRunning}
@@ -136,7 +136,7 @@ export default function Home() {
           </Stack>
           <Stack direction="row" gap={2}>
             <Button
-              variant="outline"
+              variant="subtle"
               flexGrow={1}
               onClick={actions.flashCrossPointFirmwareToBackup}
               disabled={isRunning}
@@ -149,7 +149,7 @@ export default function Home() {
               <FileUpload ref={appPartitionFileInput} />
             </Flex>
             <Button
-              variant="outline"
+              variant="subtle"
               flexGrow={1}
               onClick={() =>
                 actions.flashCustomFirmwareToBackup(() =>
