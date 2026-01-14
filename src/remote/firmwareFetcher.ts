@@ -37,9 +37,17 @@ export async function getCommunityFirmware(firmware: 'CrossPoint') {
 }
 
 export async function getCommunityFirmwareVersion() {
-  const releaseData = await fetch(
+  const response = await fetch(
     'https://api.github.com/repos/daveallie/crosspoint-reader/releases/latest',
-    { cache: 'no-store' }
-  ).then(r => r.json());
+    {
+      next: { revalidate: 900 } // every 15 minutes
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch firmware version');
+  }
+
+  const releaseData = await response.json();
   return releaseData.tag_name as string;
 }
