@@ -3,6 +3,7 @@
 import React, { ReactNode, useState } from 'react';
 import {
   Alert,
+  Badge,
   Button,
   Card,
   CloseButton,
@@ -15,6 +16,8 @@ import {
   Separator,
   Stack,
   Table,
+  Text,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { useEspOperations } from '@/esp/useEspOperations';
 import Steps from '@/components/Steps';
@@ -23,6 +26,8 @@ import OtaPartition, { OtaPartitionDetails } from '@/esp/OtaPartition';
 import HexSpan from '@/components/HexSpan';
 import HexViewer from '@/components/HexViewer';
 import { downloadData } from '@/utils/download';
+import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
+import { FirmwareInfo } from '@/utils/firmwareIdentifier';
 
 function OtadataDebug({ otaPartition }: { otaPartition: OtaPartition }) {
   const bootPartitionLabel = otaPartition.getCurrentBootPartitionLabel();
@@ -196,9 +201,80 @@ function AppDebug({
   );
 }
 
+function FirmwareIdentificationDebug({
+  app0: app0Info,
+  app1: app1Info,
+  currentBoot,
+}: {
+  app0: FirmwareInfo;
+  app1: FirmwareInfo;
+  currentBoot: 'app0' | 'app1';
+}) {
+  const getColorPalette = (
+    type: FirmwareInfo['type'],
+  ): 'green' | 'orange' | 'blue' | 'gray' => {
+    switch (type) {
+      case 'official-english':
+      case 'official-chinese':
+        return 'green';
+      case 'crosspoint':
+        return 'blue';
+      case 'unknown':
+        return 'orange';
+    }
+  };
+
+  return (
+    <Stack>
+      <Heading size="lg">Firmware Information</Heading>
+      <SimpleGrid columns={{ sm: 1, md: 2 }} gap={4}>
+        {[
+          { label: 'app0', info: app0Info },
+          { label: 'app1', info: app1Info },
+        ].map(({ label, info }) => (
+          <Card.Root
+            variant="subtle"
+            size="sm"
+            key={label}
+            colorPalette={getColorPalette(info.type)}
+          >
+            <Card.Header>
+              <Flex alignItems="center" gap={2}>
+                <Heading size="md">Partition {label}</Heading>
+                {label === currentBoot && (
+                  <Badge colorPalette="green" variant="solid" size="sm">
+                    Active
+                  </Badge>
+                )}
+              </Flex>
+            </Card.Header>
+            <Card.Body>
+              <Stack gap={2}>
+                <div>
+                  <Text fontWeight="bold">Firmware:</Text>
+                  <Text>{info.displayName}</Text>
+                </div>
+                <div>
+                  <Text fontWeight="bold">Version:</Text>
+                  <Text>{info.version}</Text>
+                </div>
+                <div>
+                  <Text fontWeight="bold">Type:</Text>
+                  <Text>{info.type}</Text>
+                </div>
+              </Stack>
+            </Card.Body>
+          </Card.Root>
+        ))}
+      </SimpleGrid>
+    </Stack>
+  );
+}
+
 export default function Debug() {
-  const { debugActions, stepData, isRunning } = useEspOperations();
+  const { actions, debugActions, stepData, isRunning } = useEspOperations();
   const [debugOutputNode, setDebugOutputNode] = useState<ReactNode>(null);
+  const appPartitionFileInput = React.useRef<FileUploadHandle>(null);
 
   return (
     <Flex direction="column" gap="20px">
@@ -225,6 +301,12 @@ export default function Debug() {
               <b>Swap boot partitions</b> will check the current boot partition
               (app0 or app1) from <Em>otadata</Em> and rewrite the data in the{' '}
               <Em>otadata</Em> to switch the boot partition.
+            </p>
+            <p>
+              <b>Identify firmware in both partitions</b> will read both app0 and
+              app1 partitions and automatically identify which firmware is
+              installed on each (Official English, Official Chinese, CrossPoint
+              Community, or Custom).
             </p>
           </Stack>
         </div>
@@ -284,6 +366,25 @@ export default function Debug() {
             disabled={isRunning}
           >
             Swap boot partitions (app0 / app1)
+          </Button>
+          <Button
+            variant="subtle"
+            onClick={() => {
+              debugActions
+                .readAndIdentifyAllFirmware()
+                .then((data) =>
+                  setDebugOutputNode(
+                    <FirmwareIdentificationDebug
+                      app0={data.app0}
+                      app1={data.app1}
+                      currentBoot={data.currentBoot}
+                    />,
+                  ),
+                );
+            }}
+            disabled={isRunning}
+          >
+            Identify firmware in both partitions
           </Button>
         </Stack>
       </Stack>
