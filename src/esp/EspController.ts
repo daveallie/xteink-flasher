@@ -104,6 +104,37 @@ export default class EspController {
     return this.espLoader.readFlash(offset, 0x640000, onPacketReceived);
   }
 
+    async readAppPartitionForIdentification(
+    partitionLabel: 'app0' | 'app1',
+    {
+      readSize = 0x6400, // Default to 25KB (0x6400) for fast identification
+      offset = 0,
+      onPacketReceived,
+    }: {
+      readSize?: number;
+      offset?: number;
+      onPacketReceived?: (
+        packet: Uint8Array,
+        progress: number,
+        totalSize: number,
+      ) => void;
+    } = {},
+  ) {
+    // Optimized read for firmware identification with flexible read size and offset:
+    // - Default (25KB / 0x6400): Fast path, covers 99% of cases
+    // - Additional chunks: Specify offset multiples of 25KB until identification succeeds
+    // In testing, most firmwares are identified within the first 25KB read, so reading the entire 
+    // partition is unnecessary in the majority of cases.
+
+    const baseOffset = partitionLabel === 'app0' ? 0x10000 : 0x650000;
+
+    return this.espLoader.readFlash(
+      baseOffset + offset,
+      readSize,
+      onPacketReceived,
+    );
+  }
+
   async writeAppPartition(
     partitionLabel: 'app0' | 'app1',
     data: Uint8Array,

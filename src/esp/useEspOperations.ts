@@ -7,6 +7,11 @@ import {
 } from '@/remote/firmwareFetcher';
 import { downloadData } from '@/utils/download';
 import { wrapWithWakeLock } from '@/utils/wakelock';
+import {
+  identifyFirmware,
+  isIdentificationSuccessful,
+  type FirmwareInfo,
+} from '@/utils/firmwareIdentifier';
 import OtaPartition, { OtaPartitionDetails } from './OtaPartition';
 import useStepRunner from './useStepRunner';
 import EspController from './EspController';
@@ -18,10 +23,10 @@ export function useEspOperations() {
 
   const wrapWithRunning =
     <Args extends unknown[], T>(fn: (...a: Args) => Promise<T>) =>
-    async (...a: Args) => {
-      setIsRunning(true);
-      return fn(...a).finally(() => setIsRunning(false));
-    };
+      async (...a: Args) => {
+        setIsRunning(true);
+        return fn(...a).finally(() => setIsRunning(false));
+      };
 
   const flashRemoteFirmware = async (
     getFirmware: () => Promise<Uint8Array>,
@@ -85,9 +90,9 @@ export function useEspOperations() {
   };
 
   const flashEnglishFirmware = async () =>
-    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-EN'));
+    flashRemoteFirmware(() => getOfficialFirmware('en'));
   const flashChineseFirmware = async () =>
-    flashRemoteFirmware(() => getOfficialFirmware('3.1.7-CH'));
+    flashRemoteFirmware(() => getOfficialFirmware('ch'));
   const flashCrossPointFirmware = async () =>
     flashRemoteFirmware(() => getCommunityFirmware('CrossPoint'));
 
@@ -374,6 +379,94 @@ export function useEspOperations() {
     );
   };
 
+  const readAndIdentifyAllFirmware = async (): Promise<{
+    app0: FirmwareInfo;
+    app1: FirmwareInfo;
+    currentBoot: 'app0' | 'app1';
+  }> => {
+    initializeSteps([
+      'Connect to device',
+      'Read otadata partition',
+      'Read app0 partition',
+      'Read app1 partition',
+      'Identify firmware types',
+      'Disconnect from device',
+    ]);
+
+    const espController = await runStep('Connect to device', async () => {
+      const c = await EspController.fromRequestedDevice();
+      await c.connect();
+      return c;
+    });
+
+    const otaPartition = await runStep('Read otadata partition', () =>
+      espController.readOtadataPartition((_, p, t) =>
+        updateStepData('Read otadata partition', {
+          progress: { current: p, total: t },
+        }),
+      ),
+    );
+
+    const currentBoot = otaPartition.getCurrentBootPartitionLabel();
+
+    const readAndIdentifyInChunks = async (partitionLabel: 'app0' | 'app1') => {
+      const chunkSize = 0x6400; // 25KB
+      const maxReadSize = 0x20000; // 128KB
+      let readData = new Uint8Array();
+      let info: FirmwareInfo | undefined;
+
+      for (let offset = 0; offset < maxReadSize; offset += chunkSize) {
+        const chunk = await espController.readAppPartitionForIdentification(
+          partitionLabel,
+          {
+            readSize: chunkSize,
+            offset,
+            onPacketReceived: (_, p, t) =>
+              updateStepData(`Read ${partitionLabel} partition`, {
+                // Show cumulative progress: offset + current chunk progress
+                // Total shows the end of current chunk range
+                progress: { current: offset + p, total: offset + t },
+              }),
+          },
+        );
+
+        const newData = new Uint8Array(readData.length + chunk.length);
+        newData.set(readData);
+        newData.set(chunk, readData.length);
+        readData = newData;
+
+        info = identifyFirmware(readData);
+        if (isIdentificationSuccessful(info)) {
+          return info;
+        }
+      }
+
+      return info ?? { type: 'unknown', version: 'unknown', displayName: 'Custom/Unknown Firmware' }; // Return the last identification result if not found
+    };
+
+    const app0Info = await runStep('Read app0 partition', () =>
+      readAndIdentifyInChunks('app0'),
+    );
+
+    const app1Info = await runStep('Read app1 partition', () =>
+      readAndIdentifyInChunks('app1'),
+    );
+
+    await runStep('Identify firmware types', async () => {
+      // This step is now just for display - identification already happened during read
+    });
+
+    await runStep('Disconnect from device', () =>
+      espController.disconnect({ skipReset: true }),
+    );
+
+    return {
+      app0: app0Info,
+      app1: app1Info,
+      currentBoot,
+    };
+  };
+
   return {
     stepData,
     isRunning,
@@ -390,6 +483,7 @@ export function useEspOperations() {
       readDebugOtadata: wrapWithRunning(readDebugOtadata),
       readAppPartition: wrapWithRunning(readAppPartition),
       swapBootPartition: wrapWithRunning(swapBootPartition),
+      readAndIdentifyAllFirmware: wrapWithRunning(readAndIdentifyAllFirmware),
     },
   };
 }

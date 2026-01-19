@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Heading,
@@ -14,12 +14,25 @@ import {
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
-import { getCommunityFirmwareData } from '@/remote/firmwareFetcher';
+import {
+  getOfficialFirmwareVersions,
+  getCommunityFirmwareData,
+} from '@/remote/firmwareFetcher';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
+  const [officialFirmwareVersions, setOfficialFirmwareVersions] = useState<{
+    en: string;
+    ch: string;
+  } | null>(null);
   const fullFlashFileInput = useRef<FileUploadHandle>(null);
   const appPartitionFileInput = useRef<FileUploadHandle>(null);
+
+  useEffect(() => {
+    getOfficialFirmwareVersions().then((versions) =>
+      setOfficialFirmwareVersions(versions),
+    );
+  }, []);
 
   const [version, setVersion] = useState<string>('\(fetching...\) date');
 
@@ -125,16 +138,18 @@ export default function Home() {
           <Button
             variant="subtle"
             onClick={actions.flashEnglishFirmware}
-            disabled={isRunning}
+            disabled={isRunning || !officialFirmwareVersions}
+            loading={!officialFirmwareVersions}
           >
-            Flash English firmware (3.1.1)
+            Flash English firmware ({officialFirmwareVersions?.en ?? '...'})
           </Button>
           <Button
             variant="subtle"
             onClick={actions.flashChineseFirmware}
-            disabled={isRunning}
+            disabled={isRunning || !officialFirmwareVersions}
+            loading={!officialFirmwareVersions}
           >
-            Flash Chinese firmware (3.1.7)
+            Flash Chinese firmware ({officialFirmwareVersions?.ch ?? '...'})
           </Button>
           <Button
             variant="subtle"
@@ -192,10 +207,23 @@ export default function Home() {
       <Alert.Root status="info">
         <Alert.Indicator />
         <Alert.Content>
+          <Alert.Title>Change device language</Alert.Title>
+          <Alert.Description>
+            Before starting the process, it is recommended to change the device
+            language to English. To do this, select "Settings" icon, then
+            click "OK / Confirm" button and "OK / Confirm" again until English is shown.
+            Otherwise, the language will still be Chinese after flashing
+            and you may not notice changes.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert.Root>
+      <Alert.Root status="info">
+        <Alert.Indicator />
+        <Alert.Content>
           <Alert.Title>Device restart instructions</Alert.Title>
           <Alert.Description>
             Once you complete a write operation, you will need to restart your
-            device by pressing and releasing the small button near the bottom
+            device by pressing and releasing the small "Reset" button near the bottom
             right, followed quickly by pressing and holding of the main power
             button for about 3 seconds.
           </Alert.Description>
