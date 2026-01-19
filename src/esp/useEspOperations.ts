@@ -23,10 +23,10 @@ export function useEspOperations() {
 
   const wrapWithRunning =
     <Args extends unknown[], T>(fn: (...a: Args) => Promise<T>) =>
-      async (...a: Args) => {
-        setIsRunning(true);
-        return fn(...a).finally(() => setIsRunning(false));
-      };
+    async (...a: Args) => {
+      setIsRunning(true);
+      return fn(...a).finally(() => setIsRunning(false));
+    };
 
   const flashRemoteFirmware = async (
     getFirmware: () => Promise<Uint8Array>,
@@ -416,6 +416,7 @@ export function useEspOperations() {
       let info: FirmwareInfo | undefined;
 
       for (let offset = 0; offset < maxReadSize; offset += chunkSize) {
+        // eslint-disable-next-line no-await-in-loop
         const chunk = await espController.readAppPartitionForIdentification(
           partitionLabel,
           {
@@ -441,7 +442,13 @@ export function useEspOperations() {
         }
       }
 
-      return info ?? { type: 'unknown', version: 'unknown', displayName: 'Custom/Unknown Firmware' }; // Return the last identification result if not found
+      return (
+        info ?? {
+          type: 'unknown',
+          version: 'unknown',
+          displayName: 'Custom/Unknown Firmware',
+        }
+      ); // Return the last identification result if not found
     };
 
     const app0Info = await runStep('Read app0 partition', () =>

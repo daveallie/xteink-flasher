@@ -19,9 +19,9 @@ function findString(
     return -1;
   }
 
-  for (let i = startOffset; i <= data.length - searchBytes.length; i++) {
+  for (let i = startOffset; i <= data.length - searchBytes.length; i += 1) {
     let match = true;
-    for (let j = 0; j < searchBytes.length; j++) {
+    for (let j = 0; j < searchBytes.length; j += 1) {
       if (data[i + j] !== searchBytes[j]) {
         match = false;
         break;
@@ -73,7 +73,7 @@ function extractVersion(data: Uint8Array, searchLimit = 25000): string {
 
   // Try to find V-pattern versions (official firmware)
   // Pattern: [any byte]<V3.1.1 or similar
-  for (let i = 0; i < searchArea.length - 8; i++) {
+  for (let i = 0; i < searchArea.length - 8; i += 1) {
     if (searchArea[i] === 0x56) {
       // 'V' character
       const chunk = decoder.decode(
@@ -91,12 +91,16 @@ function extractVersion(data: Uint8Array, searchLimit = 25000): string {
     const fullString = decoder.decode(searchArea);
 
     // Check for CrossPoint-ESP32-x.x.x pattern
-    const crossPointMatch = fullString.match(/CrossPoint-ESP32-(\d+\.\d+\.\d+)/);
+    const crossPointMatch = fullString.match(
+      /CrossPoint-ESP32-(\d+\.\d+\.\d+)/,
+    );
     if (crossPointMatch) {
       return crossPointMatch[1]!;
     }
 
+    // eslint-disable-next-line no-control-regex
     const lines = fullString.split(/[\x00\n]/);
+    // eslint-disable-next-line no-restricted-syntax
     for (const line of lines) {
       const match = line.match(/^\d+\.\d+\.\d+$/);
       if (match) {
@@ -107,7 +111,7 @@ function extractVersion(data: Uint8Array, searchLimit = 25000): string {
     // Also search for version in common patterns
     const versionMatch = fullString.match(/(?:Version[:\s]*)(\d+\.\d+\.\d+)/i);
     if (versionMatch?.[1]) {
-      return versionMatch[1] as string;
+      return versionMatch[1];
     }
   } catch {
     // Decoding failed, continue
@@ -162,7 +166,7 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
     if (findString(areaAfterVersion, 'XTOS') !== -1) {
       return {
         type: 'official-chinese',
-        version: version,
+        version,
         displayName: 'Official Chinese',
       };
     }
@@ -171,7 +175,7 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
     // If we have a V-pattern version, valid ESP32 image, but no XTOS → English
     return {
       type: 'official-english',
-      version: version,
+      version,
       displayName: 'Official English',
     };
   }
@@ -183,7 +187,7 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
   ) {
     return {
       type: 'crosspoint',
-      version: version,
+      version,
       displayName: 'CrossPoint Community Reader',
     };
   }
@@ -191,7 +195,7 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
   // Unknown firmware
   return {
     type: 'unknown',
-    version: version,
+    version,
     displayName: 'Custom/Unknown Firmware',
   };
 }

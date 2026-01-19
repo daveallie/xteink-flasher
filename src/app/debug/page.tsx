@@ -26,7 +26,6 @@ import OtaPartition, { OtaPartitionDetails } from '@/esp/OtaPartition';
 import HexSpan from '@/components/HexSpan';
 import HexViewer from '@/components/HexViewer';
 import { downloadData } from '@/utils/download';
-import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import { FirmwareInfo } from '@/utils/firmwareIdentifier';
 
 function OtadataDebug({ otaPartition }: { otaPartition: OtaPartition }) {
@@ -220,6 +219,7 @@ function FirmwareIdentificationDebug({
       case 'crosspoint':
         return 'blue';
       case 'unknown':
+      default:
         return 'orange';
     }
   };
@@ -272,9 +272,8 @@ function FirmwareIdentificationDebug({
 }
 
 export default function Debug() {
-  const { actions, debugActions, stepData, isRunning } = useEspOperations();
+  const { debugActions, stepData, isRunning } = useEspOperations();
   const [debugOutputNode, setDebugOutputNode] = useState<ReactNode>(null);
-  const appPartitionFileInput = React.useRef<FileUploadHandle>(null);
 
   return (
     <Flex direction="column" gap="20px">
@@ -284,8 +283,8 @@ export default function Debug() {
           <Stack gap={1} color="grey" textStyle="sm">
             <p>
               These are few tools to help debugging / administering your Xtink
-              device. They&apos;re designed to be used by those who are
-              intentionally messing around with their device.
+              device. They’re designed to be used by those who are intentionally
+              messing around with their device.
             </p>
             <p>
               <b>Read otadata partition</b> will read the raw data out of the{' '}
@@ -303,8 +302,8 @@ export default function Debug() {
               <Em>otadata</Em> to switch the boot partition.
             </p>
             <p>
-              <b>Identify firmware in both partitions</b> will read both app0 and
-              app1 partitions and automatically identify which firmware is
+              <b>Identify firmware in both partitions</b> will read both app0
+              and app1 partitions and automatically identify which firmware is
               installed on each (Official English, Official Chinese, CrossPoint
               Community, or Custom).
             </p>
