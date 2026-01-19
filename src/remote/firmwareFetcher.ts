@@ -2,7 +2,26 @@
 
 import { getCache } from '@vercel/functions';
 
-const firmwareVersionFallback = {
+interface OfficialFirmwareData {
+  change_log: string;
+  download_url: string;
+  version: string;
+}
+
+interface OfficialFirmwareVersions {
+  en: OfficialFirmwareData;
+  ch: OfficialFirmwareData;
+}
+
+interface CommunityFirmwareVersions {
+  crossPoint: {
+    version: string;
+    releaseDate: string;
+    downloadUrl: string;
+  };
+}
+
+const firmwareVersionFallback: OfficialFirmwareVersions = {
   en: {
     change_log:
       '1. Optimize EPUB/TXT  \r\n2. Optimize JPG speed  \r\n3. Optimize Wi-Fi connection  \r\n4. Optimize EPUB covers',
@@ -24,11 +43,11 @@ const chineseFirmwareCheckUrl =
 const englishFirmwareCheckUrl =
   'http://gotaserver.xteink.com/api/check-update?current_version=V3.0.1&device_type=ESP32C3&device_id=1234';
 
-export async function getOfficialFirmwareRemoteData() {
+export async function getOfficialFirmwareRemoteData(): Promise<OfficialFirmwareVersions> {
   const cache = getCache();
-  const cacheKey = 'firmware-versions.v1';
+  const cacheKey = 'firmware-versions.official.v1';
 
-  const value = await cache.get(cacheKey);
+  const value = (await cache.get(cacheKey)) as OfficialFirmwareVersions | null;
   if (value) {
     return value;
   }
@@ -39,7 +58,7 @@ export async function getOfficialFirmwareRemoteData() {
   ])
     .then(([chRes, enRes]) => Promise.all([chRes.json(), enRes.json()]))
     .then(async ([chData, enData]) => {
-      const data = {
+      const data: OfficialFirmwareVersions = {
         en: enData.data,
         ch: chData.data,
       };
@@ -62,6 +81,43 @@ export async function getOfficialFirmwareVersions() {
   };
 }
 
+export async function getCommunityFirmwareRemoteData(): Promise<CommunityFirmwareVersions> {
+  const cache = getCache();
+  const cacheKey = 'firmware-versions.community.v1';
+
+  const value = (await cache.get(cacheKey)) as CommunityFirmwareVersions | null;
+  if (value) {
+    return value;
+  }
+
+  const releaseData = await fetch(
+    'https://api.github.com/repos/daveallie/crosspoint-reader/releases/latest',
+  ).then((resp) => resp.json());
+
+  const firmwareAsset = releaseData.assets.find((asset: any) =>
+    asset.name.endsWith('firmware.bin'),
+  );
+  if (!firmwareAsset) {
+    throw new Error('CrossPoint firmware asset not found');
+  }
+
+  const data = {
+    crossPoint: {
+      version: releaseData.tag_name,
+      releaseDate: new Date(releaseData.published_at)
+        .toISOString()
+        .slice(0, 10),
+      downloadUrl: firmwareAsset.browser_download_url,
+    },
+  };
+
+  await cache.set(cacheKey, data, {
+    ttl: 60 * 60, // 1 hour
+  });
+
+  return data;
+}
+
 export async function getOfficialFirmware(region: 'en' | 'ch') {
   const url = await getOfficialFirmwareRemoteData().then(
     (data) => data[region].download_url,
@@ -70,22 +126,11 @@ export async function getOfficialFirmware(region: 'en' | 'ch') {
   return new Uint8Array(await response.arrayBuffer());
 }
 
-export async function getCommunityFirmware(firmware: 'CrossPoint') {
-  if (firmware === 'CrossPoint') {
-    const releaseData = await fetch(
-      'https://api.github.com/repos/daveallie/crosspoint-reader/releases/latest',
-    ).then((resp) => resp.json());
+export async function getCommunityFirmware(_firmware: 'CrossPoint') {
+  const releaseData = await getCommunityFirmwareRemoteData().then(
+    (data) => data.crossPoint,
+  );
 
-    const firmwareAsset = releaseData.assets.find((asset: any) =>
-      asset.name.endsWith('firmware.bin'),
-    );
-    if (!firmwareAsset) {
-      throw new Error('CrossPoint firmware asset not found');
-    }
-    const url: string = firmwareAsset.browser_download_url;
-    const response = await fetch(url);
-    return new Uint8Array(await response.arrayBuffer());
-  }
-
-  throw new Error('Unsupported community firmware');
+  const response = await fetch(releaseData.downloadUrl);
+  return new Uint8Array(await response.arrayBuffer());
 }

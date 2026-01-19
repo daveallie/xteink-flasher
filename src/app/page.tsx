@@ -14,13 +14,19 @@ import {
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
-import { getOfficialFirmwareVersions } from '@/remote/firmwareFetcher';
+import {
+  getOfficialFirmwareVersions,
+  getCommunityFirmwareRemoteData,
+} from '@/remote/firmwareFetcher';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
   const [officialFirmwareVersions, setOfficialFirmwareVersions] = useState<{
     en: string;
     ch: string;
+  } | null>(null);
+  const [communityFirmwareVersions, setCommunityFirmwareVersions] = useState<{
+    crossPoint: { version: string; releaseDate: string };
   } | null>(null);
   const fullFlashFileInput = useRef<FileUploadHandle>(null);
   const appPartitionFileInput = useRef<FileUploadHandle>(null);
@@ -29,6 +35,8 @@ export default function Home() {
     getOfficialFirmwareVersions().then((versions) =>
       setOfficialFirmwareVersions(versions),
     );
+
+    getCommunityFirmwareRemoteData().then(setCommunityFirmwareVersions);
   }, []);
 
   return (
@@ -141,9 +149,12 @@ export default function Home() {
           <Button
             variant="subtle"
             onClick={actions.flashCrossPointFirmware}
-            disabled={isRunning}
+            disabled={isRunning || !communityFirmwareVersions}
+            loading={!communityFirmwareVersions}
           >
-            Flash CrossPoint firmware (Community)
+            Flash CrossPoint firmware (
+            {communityFirmwareVersions?.crossPoint.version}) -{' '}
+            {communityFirmwareVersions?.crossPoint.releaseDate}
           </Button>
           <Stack direction="row">
             <Flex grow={1}>
