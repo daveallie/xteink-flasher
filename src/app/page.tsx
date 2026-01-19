@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Heading,
@@ -14,11 +14,22 @@ import {
 import FileUpload, { FileUploadHandle } from '@/components/FileUpload';
 import Steps from '@/components/Steps';
 import { useEspOperations } from '@/esp/useEspOperations';
+import { getOfficialFirmwareVersions } from '@/remote/firmwareFetcher';
 
 export default function Home() {
   const { actions, stepData, isRunning } = useEspOperations();
+  const [officialFirmwareVersions, setOfficialFirmwareVersions] = useState<{
+    en: string;
+    ch: string;
+  } | null>(null);
   const fullFlashFileInput = useRef<FileUploadHandle>(null);
   const appPartitionFileInput = useRef<FileUploadHandle>(null);
+
+  useEffect(() => {
+    getOfficialFirmwareVersions().then((versions) =>
+      setOfficialFirmwareVersions(versions),
+    );
+  }, []);
 
   return (
     <Flex direction="column" gap="20px">
@@ -114,16 +125,18 @@ export default function Home() {
           <Button
             variant="subtle"
             onClick={actions.flashEnglishFirmware}
-            disabled={isRunning}
+            disabled={isRunning || !officialFirmwareVersions}
+            loading={!officialFirmwareVersions}
           >
-            Flash English firmware (3.1.1)
+            Flash English firmware ({officialFirmwareVersions?.en ?? '...'})
           </Button>
           <Button
             variant="subtle"
             onClick={actions.flashChineseFirmware}
-            disabled={isRunning}
+            disabled={isRunning || !officialFirmwareVersions}
+            loading={!officialFirmwareVersions}
           >
-            Flash Chinese firmware (3.1.7)
+            Flash Chinese firmware ({officialFirmwareVersions?.ch ?? '...'})
           </Button>
           <Button
             variant="subtle"

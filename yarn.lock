@@ -1494,6 +1494,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/functions@npm:^3.3.6":
+  version: 3.3.6
+  resolution: "@vercel/functions@npm:3.3.6"
+  dependencies:
+    "@vercel/oidc": "npm:3.1.0"
+  peerDependencies:
+    "@aws-sdk/credential-provider-web-identity": "*"
+  peerDependenciesMeta:
+    "@aws-sdk/credential-provider-web-identity":
+      optional: true
+  checksum: 10c0/5384892e0f6b3907bcf7bb5c8de92fd0ffa7bb33d0a14edda9190255c8a5a6945ab8d02c3b5abc7182ff38d4d977ebd1a202451e3d802a0be785347d64223328
+  languageName: node
+  linkType: hard
+
+"@vercel/oidc@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@vercel/oidc@npm:3.1.0"
+  checksum: 10c0/f57278ed4b4c022c7ca85e8baa5f9bdb2623397abfa0e5dbfd75de283c8e5dc534d64dac1364b5ad8c96d00eb2d469886e6f7b640f6f195def5766950ad8ce71
+  languageName: node
+  linkType: hard
+
 "@zag-js/accordion@npm:1.29.1":
   version: 1.29.1
   resolution: "@zag-js/accordion@npm:1.29.1"
@@ -5727,6 +5748,7 @@ __metadata:
     "@types/node": "npm:^24.10.4"
     "@types/react": "npm:^19.2.7"
     "@types/react-dom": "npm:^19.2.3"
+    "@vercel/functions": "npm:^3.3.6"
     babel-plugin-react-compiler: "npm:^1.0.0"
     classnames: "npm:^2.5.1"
     crc: "npm:^4.3.2"
