@@ -7,7 +7,8 @@
     "lint:fix": "yarn eslint --max-warnings 0 --cache --fix && yarn prettier --write .",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prepare": "husky"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.31.0",
@@ -44,9 +45,17 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "yarn eslint --cache --fix --max-warnings 0 --no-warn-ignored",
+      "yarn prettier --write"
+    ]
   },
   "packageManager": "yarn@4.11.0"
 }
