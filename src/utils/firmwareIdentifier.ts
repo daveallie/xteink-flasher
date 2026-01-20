@@ -156,14 +156,16 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
 
   // Check for official firmwares using XTOS proximity
   if (versionOffset !== -1 && version.startsWith('V') && isValidImage) {
-    // Check area after version (next 50 bytes) for XTOS indicator
-    const areaAfterVersion = searchArea.slice(
-      versionOffset,
-      Math.min(versionOffset + 50, searchArea.length),
+    // Check area around version (50 bytes before and after) for XTOS indicator
+    const startOffset = Math.max(0, versionOffset - 50);
+    const endOffset = Math.min(
+      searchArea.length,
+      versionOffset + version.length + 50,
     );
+    const areaAroundVersion = searchArea.slice(startOffset, endOffset);
 
-    // Chinese firmware has "XTOS" right after version
-    if (findString(areaAfterVersion, 'XTOS') !== -1) {
+    // Chinese firmware has "XTOS" nearby version
+    if (findString(areaAroundVersion, 'XTOS') !== -1) {
       return {
         type: 'official-chinese',
         version,
@@ -171,7 +173,7 @@ export function identifyFirmware(firmwareData: Uint8Array): FirmwareInfo {
       };
     }
 
-    // English firmware has NO XTOS after version
+    // English firmware has NO XTOS around version
     // If we have a V-pattern version, valid ESP32 image, but no XTOS → English
     return {
       type: 'official-english',
